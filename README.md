@@ -1,5 +1,6 @@
 
 The Nephgen scExplorer
+
 The single-cell explorer "scEplorer" is a searchable database to visualize gene expression from RNA-sequencing.
 Its intended use is to make datasets generated within the NephGen Initiative (CRC 1453) findable, accessible and searchable, for all reasearchers within the initiative and to thereby promote scientific collaboration and progress. It allows for downloading of plots, as well as lists of marker genes.
 Upon publication the datasets will also be publicly accessible via the scExplorer.
