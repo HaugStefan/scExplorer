@@ -717,8 +717,8 @@ observe({
 ## color scale range
 output[["expression_heatmap_color_scale_range"]] <- renderUI({
   
-  if (!is.null((expression_heatmap_data()$av_expression)) &&
-      length(expression_heatmap_data()$av_expression) > 0) {
+  if (!is.null((expression_heatmap_data()$av_expression)) && length(expression_heatmap_data()$av_expression) > 0)
+       {
    
     range<- c(min(expression_heatmap_data()$av_expression), 
               max(expression_heatmap_data()$av_expression))
@@ -853,16 +853,23 @@ expression_heatmap_data <- reactive({
   hmap_dataframe <- cbind(cluster_matrix, expression_matrix)
   hmap_dataframe[2] <- NULL  # remove cell barcodes
   
-  # calculate average expression per cluster
-  hmap_dataframe <- hmap_dataframe %>% group_by(cluster) %>% summarise_all(funs(mean))
   
+  if( ncol(hmap_dataframe) > 1) {
+    # calculate average expression per cluster
+    hmap_dataframe <- hmap_dataframe %>% group_by(cluster) %>% summarise_all(funs(mean))
+    
     # remove cluster column
-  hmap_matrix <- t(as.matrix(hmap_dataframe[-1]))
-  
-  #normalize if selected and more than one cluster selected
-  if(rescale == "Rescale per gene" && length(clusters_to_display) > 1) {
-    hmap_matrix <- t(apply(hmap_matrix, 1, function(x){(x-min(x))/(max(x)-min(x))}))
+    hmap_matrix <- t(as.matrix(hmap_dataframe[-1]))
+    
+    #normalize if selected and more than one cluster selected
+    if(rescale == "Rescale per gene" && length(clusters_to_display) > 1) {
+      hmap_matrix <- t(apply(hmap_matrix, 1, function(x){(x-min(x))/(max(x)-min(x))}))
+    }
+    
+  } else {
+    hmap_matrix <- NULL
   }
+
   
   # generate ouput data
   hmap_data <- list()
