@@ -20,14 +20,7 @@ tab_gene_expression <- tabItem(
         tagList(
           # gene list input
           column(width = 9, offset = 0, style = "padding: 0px;", 
-                 #uiOutput("gene_selection_UI")
-                 selectizeInput(
-                   'expression_genes_input',
-                   label = NULL,
-                   choices = c(""), #gene_names(),  #rownames(sample_data()$expression),
-                   options = list(create = TRUE, placeholder = "Choose or enter gene name(s) here"),
-                   multiple = TRUE
-                 )
+                 uiOutput("gene_selection_UI")
           ),
           # reset gene list
           column(width = 1, offset = 0, style = "padding-left: 10px;",
@@ -46,30 +39,7 @@ tab_gene_expression <- tabItem(
     ),
     
     fluidRow(
-      #uiOutput("expression_violin_plot_UI")
-      cerebroBox(
-        title = tagList(
-          boxTitle("Expression levels by cluster"),
-          #cerebroInfoButton("expression_violin_plot_info")
-        ),
-        tagList(
-          column(width = 9, offset = 0, style = "padding: 0px;",
-                 #h1("expression by cluster")
-                 plotly::plotlyOutput("expression_violin_plot")
-          ),
-          column(width = 3, offset = 0, style = "padding-left: 20px;",
-                 #uiOutput("expression_violin_plot_options")
-                 shinyWidgets::pickerInput(
-                   "expression_violin_plot_cluster_select",
-                   label = "Cluster selection",
-                   choices = c(""),#sample_data()$cluster_names,
-                   selected = c(""),#sample_data()$cluster_names,
-                   options = list("actions-box" = TRUE),
-                   multiple = TRUE
-                 )
-          )
-        )
-      )
+      uiOutput("expression_violin_plot_UI")
     ),
     
     fluidRow(
@@ -91,8 +61,8 @@ tab_gene_expression <- tabItem(
                    shinyWidgets::pickerInput(
                      "expression_heatmap_cluster_select",
                      label = "Cluster selection",
-                     choices = c(1,2,3,4), #sample_data()$cluster_names,
-                     selected = c(1,2,3,4), # sample_data()$cluster_names,  # selcected specifies initially selected values
+                     choices = sample_data()$cluster_names,
+                     selected = sample_data()$cluster_names,  # selcected specifies initially selected values
                      options = list("actions-box" = TRUE),
                      multiple = TRUE
                    ),
@@ -107,13 +77,6 @@ tab_gene_expression <- tabItem(
                      label = "Color scale",
                      choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
                      selected = "Cividis"
-                   ),
-                   sliderInput(
-                     "expression_heatmap_color_range_slider",
-                     label = "Range of color scale",
-                     min = 0,
-                     max = 1,
-                     value = c(0, 1)
                    )
                  )
           )
@@ -123,7 +86,7 @@ tab_gene_expression <- tabItem(
       
     ),
     fluidRow(
-      #uiOutput("expression_dim_reduction_UI")
+      uiOutput("expression_dim_reduction_UI")
       
     ),
   )

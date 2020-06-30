@@ -7,20 +7,38 @@
 # collapse the boxes.
 
 # Trace massages to browser:
-#options(shiny.trace = TRUE)
+options(shiny.trace = TRUE)
 
 
 
 # Update controls when sample data has changed
 observeEvent(sample_data(),{
   
-  updateSelectInput(session, "expression_violin_plot_cluster_select",
-                       choices = sample_data()$cluster_names,
-                       selected = sample_data()$cluster_names)
+  # updateSelectInput(session, "expression_violin_plot_cluster_select",
+  #                      choices = sample_data()$cluster_names,
+  #                      selected = sample_data()$cluster_names)
   
-  updateSelectInput(session, "expression_heatmap_cluster_select",
-                    choices = sample_data()$cluster_names,
-                    selected = sample_data()$cluster_names)
+  # updateSelectInput(session, "expression_heatmap_cluster_select",
+  #                   choices = sample_data()$cluster_names,
+  #                   selected = sample_data()$cluster_names)
+  
+  # show loading screen
+  w$show()
+  
+  
+  # Update gene list 
+  updateSelectizeInput(session, "expression_genes_input",
+                       choices =  rownames(sample_data()$expression),
+                       server = TRUE)
+
+  # Cluster Selection Expression Heatmap
+  shinyWidgets::updatePickerInput(session, "expression_heatmap_cluster_select",
+                                  choices = sample_data()$cluster_names,
+                                  selected = sample_data()$cluster_names)
+  
+  shinyWidgets::updatePickerInput(session, "expression_violin_plot_cluster_select",
+                                  choices = sample_data()$cluster_names,
+                                  selected = sample_data()$cluster_names)
   
   updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
                        choices = sample_data()$cluster_names,
@@ -30,6 +48,7 @@ observeEvent(sample_data(),{
                     choices = sample_data()$projections,
                     selected = sample_data()$projections)
 
+  w$hide()
 })
 
 
@@ -39,34 +58,38 @@ observeEvent(sample_data(),{
 ## UI: GENE SELECTION
 ##----------------------------------------------------------------------------##
 
-output[["gene_selection_UI"]] <- renderUI ({
-  if(is.null(sample_data())) {
-    p("No dataset loaded.")
-  } else {
-    tagList(
-      selectizeInput(
-        'expression_genes_input',
-        label = NULL,
-        choices = gene_names(),  #rownames(sample_data()$expression),
-        options = list(create = TRUE, placeholder = "Choose or enter gene name(s) here"),
-        multiple = TRUE
-      )
-    )
-  }
-})
-
+# output[["gene_selection_UI"]] <- renderUI ({
+#   if(is.null(sample_data())) {
+#     p("No dataset loaded.")
+#   } else {
+#     tagList(
+#       selectizeInput(
+#         'expression_genes_input',
+#         label = NULL,
+#         choices = gene_names(),  #rownames(sample_data()$expression),
+#         options = list(create = TRUE, placeholder = "Choose or enter gene name(s) here"),
+#         multiple = TRUE
+#       )
+#     )
+#   }
+# })
 
 
 ## Observe reset Button
-observeEvent(input$reset_genes, {
-  shinyjs::reset("gene_selection_UI")
-}) 
+ observeEvent(input$reset_genes, {
+#   shinyjs::reset("gene_selection_UI")
+   reset("expression_genes_input")
+   # updateSelectizeInput(session, "expression_genes_input",
+   #                      selected = NULL)
+ }) 
+
+
 
 
 ## Make gene names reactive and add loading animation
 # Here the sample expression data is loaded for the first time which takes 
 # the longest loading time.
-w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading expression data ..."),
+w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading Dataset ..."),
                                p("Depending on connection and hardware, loading may require up to 60 seconds.")   ),
                 color = "rgb(0, 0, 0, .8)")
 
@@ -513,47 +536,47 @@ expression_dim_reduction_plot_data <- reactive({
 # Expression violin plot box
 
 
-output[["expression_violin_plot_UI"]] <- renderUI({
-    if ( length(input[["expression_genes_input"]]) < 2) {
-      tagList(
-        cerebroBox(
-          title = tagList(
-            boxTitle("Expression levels by cluster"),
-            #cerebroInfoButton("expression_violin_plot_info")
-          ),
-          tagList(
-            column(width = 9, offset = 0, style = "padding: 0px;",
-                   #h1("expression by cluster")
-                   plotly::plotlyOutput("expression_violin_plot")
-            ),
-            column(width = 3, offset = 0, style = "padding-left: 20px;",
-                   uiOutput("expression_violin_plot_options")
-            )
-          )
-        )
-      ) 
-    } 
-})
+# output[["expression_violin_plot_UI"]] <- renderUI({
+#     if ( length(input[["expression_genes_input"]]) < 2) {
+#       tagList(
+#         cerebroBox(
+#           title = tagList(
+#             boxTitle("Expression levels by cluster"),
+#             #cerebroInfoButton("expression_violin_plot_info")
+#           ),
+#           tagList(
+#             column(width = 9, offset = 0, style = "padding: 0px;",
+#                    #h1("expression by cluster")
+#                    plotly::plotlyOutput("expression_violin_plot")
+#             ),
+#             column(width = 3, offset = 0, style = "padding-left: 20px;",
+#                    uiOutput("expression_violin_plot_options")
+#             )
+#           )
+#         )
+#       ) 
+#     } 
+# })
   
 
-output[["expression_violin_plot_options"]] <- renderUI({
-  
-  tagList(
-    shinyWidgets::pickerInput(
-      "expression_violin_plot_cluster_select",
-      label = "Cluster selection",
-      choices = sample_data()$cluster_names,
-      selected = sample_data()$cluster_names,
-      options = list("actions-box" = TRUE),
-      multiple = TRUE
-    )
-  )
-})
+# output[["expression_violin_plot_options"]] <- renderUI({
+#   
+#   tagList(
+#     shinyWidgets::pickerInput(
+#       "expression_violin_plot_cluster_select",
+#       label = "Cluster selection",
+#       choices = sample_data()$cluster_names,
+#       selected = sample_data()$cluster_names,
+#       options = list("actions-box" = TRUE),
+#       multiple = TRUE
+#     )
+#   )
+# })
 
 #Observe if sample_data has changed and update select_input
 #Observers use eagerevaluation (reactive lazy evaluation)!
-# observe({
-#   updateSelectInput(session, "expression_violin_plot_cluster_select",
+# observeEvent(sample_data(),{
+#   shinyWidgets::updatePickerInput(session, "expression_violin_plot_cluster_select",
 #                     choices = sample_data()$cluster_names,
 #                     selected = sample_data()$cluster_names)
 # })
@@ -678,104 +701,118 @@ expression_violin_plot_data <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## UI: HEATMAP
+## UPDATE HEATMAP CONTROLS
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 # Heatmap Box
 
-output[["expression_heatmap_UI"]] <- renderUI({
-  
-  plot_height <- "400px"
-  
-  tagList(
-    cerebroBox(
-      title = tagList(
-        boxTitle("Average gene expression within clusters"),
-        #cerebroInfoButton("expression_violin_plot_info")
-      ),
-      tagList(
-        column(width = 9, offset = 0, style = "padding: 0px;",
-               plotly::plotlyOutput("expression_heatmap", height = plot_height)
-        )
-        ,
-        column(width = 3, offset = 0, style = "padding-left: 20px;",
-               uiOutput("expression_heatmap_options"),
-               uiOutput("expression_heatmap_color_scale_range")
-        )
-      )
-    )
-  )
-})
-
-# heatmap controls
-output[["expression_heatmap_options"]] <- renderUI({
-  print("heatmap options")
-  tagList(
-    shinyWidgets::pickerInput(
-      "expression_heatmap_cluster_select",
-      label = "Cluster selection",
-      choices = sample_data()$cluster_names,
-      selected = sample_data()$cluster_names,  # selcected specifies initially selected values
-      options = list("actions-box" = TRUE),
-      multiple = TRUE
-    ),
-    selectInput(
-      "expression_heatmap_rescaling_select",
-      label = "Rescaling",
-      choices = c("No rescaling", "Rescale per gene"),
-      selected = "Random"
-    ),
-    selectInput(
-      "expression_heatmap_color_scale",
-      label = "Color scale",
-      choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
-      selected = "Cividis"
-    )
-  )
-})
-
-
-# Observe if sample_data has changed and update select_input
-# Observers use eagerevaluation (reactive lazy evaluation)!
-# observe({
-#   updateSelectInput(session, "expression_heatmap_cluster_select",
-#                     choices = sample_data()$cluster_names,
-#                     selected = sample_data()$cluster_names)
-# 
+# output[["expression_heatmap_UI"]] <- renderUI({
+#   
+#   plot_height <- "400px"
+#   
+#   tagList(
+#     cerebroBox(
+#       title = tagList(
+#         boxTitle("Average gene expression within clusters"),
+#         #cerebroInfoButton("expression_violin_plot_info")
+#       ),
+#       tagList(
+#         column(width = 9, offset = 0, style = "padding: 0px;",
+#                plotly::plotlyOutput("expression_heatmap", height = plot_height)
+#         )
+#         ,
+#         column(width = 3, offset = 0, style = "padding-left: 20px;",
+#                uiOutput("expression_heatmap_options"),
+#                uiOutput("expression_heatmap_color_scale_range")
+#         )
+#       )
+#     )
+#   )
 # })
 
 
 
-## color scale range
-output[["expression_heatmap_color_scale_range"]] <- renderUI({
+# heatmap controls
+# output[["expression_heatmap_options"]] <- renderUI({
+#   print("heatmap options")
+#   tagList(
+#     shinyWidgets::pickerInput(
+#       "expression_heatmap_cluster_select",
+#       label = "Cluster selection",
+#       choices = sample_data()$cluster_names,
+#       selected = sample_data()$cluster_names,  # selcected specifies initially selected values
+#       options = list("actions-box" = TRUE),
+#       multiple = TRUE
+#     ),
+#     selectInput(
+#       "expression_heatmap_rescaling_select",
+#       label = "Rescaling",
+#       choices = c("No rescaling", "Rescale per gene"),
+#       selected = "Random"
+#     ),
+#     selectInput(
+#       "expression_heatmap_color_scale",
+#       label = "Color scale",
+#       choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
+#       selected = "Cividis"
+#     )
+#   )
+# })
+
+
+# Observe if sample_data has changed and update select_input
+# Observers use eagerevaluation (reactive lazy evaluation)!
+
+# update controls for expression heatmap when sample data changes
+observeEvent(sample_data(),{
   
-  if (!is.null((expression_heatmap_data()$av_expression)) && length(expression_heatmap_data()$av_expression) > 0)
-       {
-   
-    range<- c(min(expression_heatmap_data()$av_expression), 
-              max(expression_heatmap_data()$av_expression))
-    
-  } else {
-    range <- c(0,1)
-  }
+  # Cluster Selection
+  # shinyWidgets::updatePickerInput(session, "expression_heatmap_cluster_select",
+  #                   choices = sample_data()$cluster_names,
+  #                   selected = sample_data()$cluster_names)
   
-  if ( range[1] == 0 & range[2] == 0 ) {
-    range[2] = 1
-  } else {
-    range[1] <- range[1] %>% round(digits = 2)
-    range[2] <- range[2] %>% round(digits = 2)
-  }
-  tagList(
-    sliderInput(
-      "expression_heatmap_color_range_slider",
-      label = "Range of color scale",
-      min = range[1],
-      max = range[2],
-      value = c(range[1], range[2])
-    )
-  )
+  # Color Range
+  # updateSliderInput(session, "expression_heatmap_color_range_slider",
+  #                   min = range[1],
+  #                   max = range[2],
+  #                   value = c(range[1], range[2])
+  # )
+  
+  
 })
+
+
+
+## color scale range
+# output[["expression_heatmap_color_scale_range"]] <- renderUI({
+#   
+#   if (!is.null((expression_heatmap_data()$av_expression)) && length(expression_heatmap_data()$av_expression) > 0)
+#        {
+#    
+#     range<- c(min(expression_heatmap_data()$av_expression), 
+#               max(expression_heatmap_data()$av_expression))
+#     
+#   } else {
+#     range <- c(0,1)
+#   }
+#   
+#   if ( range[1] == 0 & range[2] == 0 ) {
+#     range[2] = 1
+#   } else {
+#     range[1] <- range[1] %>% round(digits = 2)
+#     range[2] <- range[2] %>% round(digits = 2)
+#   }
+#   tagList(
+#     sliderInput(
+#       "expression_heatmap_color_range_slider",
+#       label = "Range of color scale",
+#       min = range[1],
+#       max = range[2],
+#       value = c(range[1], range[2])
+#     )
+#   )
+# })
 ##----------------------------------------------------------------------------##
 # Heatmap Plot
 
@@ -797,27 +834,28 @@ output[["expression_heatmap"]] <- plotly::renderPlotly({
   req(
     input[["expression_heatmap_cluster_select"]],
     input[["expression_heatmap_rescaling_select"]],
-    input[["expression_heatmap_color_scale"]],
-    input[["expression_heatmap_color_range_slider"]]
+    input[["expression_heatmap_color_scale"]]    #,
+   # input[["expression_heatmap_color_range_slider"]]
   )
   print("heatmap graph")
+  print(expression_heatmap_data()$av_expression)
   color_scale <- input[["expression_heatmap_color_scale"]]
-  colorscale_min <- input[["expression_heatmap_color_range_slider"]][1]
-  colorscale_max <- input[["expression_heatmap_color_range_slider"]][2]
+  #colorscale_min <- input[["expression_heatmap_color_range_slider"]][1]
+  #colorscale_max <- input[["expression_heatmap_color_range_slider"]][2]
     
   plotly::plot_ly(
     x = expression_heatmap_data()$clusters,
     y = expression_heatmap_data()$genes,
     z = expression_heatmap_data()$av_expression,
     
-    height = expression_heatmap_height(),
+    #height = expression_heatmap_height(),
     xgap = 4,
     ygap = 4,
     type = "heatmap",
     colorscale= color_scale,
-    zauto = FALSE,
-    zmin = colorscale_min,
-    zmax = colorscale_max,
+    zauto = TRUE,
+    #zmin = colorscale_min,
+    #zmax = colorscale_max,
     reversescale = FALSE,
     colorbar = list(
       title = "Expression",
