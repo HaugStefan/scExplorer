@@ -25,11 +25,11 @@ sample_data <- reactive({
     sample_data <- readRDS(paste0("data/", DStable[input$table_scDatasets_rows_selected, "FileName"]))
   }
   #get list of sample names (remove later)
-  if ( is.factor(sample_data$cells$sample) ) {
-    sample_data$sample_names <- levels(sample_data$cells$sample)
-  } else {
-    sample_data$sample_names <- sample_data$cells$sample %>% unique()
-  }
+  # if ( is.factor(sample_data$cells$sample) ) {
+  #   sample_data$sample_names <- levels(sample_data$cells$sample)
+  # } else {
+  #   sample_data$sample_names <- sample_data$cells$sample %>% unique()
+  # }
   #get list of cluster names (remove later)
   if ( is.factor(sample_data$cells$cluster) ) {
     sample_data$cluster_names <- levels(sample_data$cells$cluster)

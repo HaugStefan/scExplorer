@@ -6,6 +6,34 @@
 # Here boxes are rendered by the server function because user actions can 
 # collapse the boxes.
 
+# Trace massages to browser:
+options(shiny.trace = TRUE)
+
+
+
+# Update controls when sample data has changed
+observeEvent(sample_data(),{
+  
+  updateSelectInput(session, "expression_violin_plot_cluster_select",
+                       choices = sample_data()$cluster_names,
+                       selected = sample_data()$cluster_names)
+  
+  updateSelectInput(session, "expression_heatmap_cluster_select",
+                    choices = sample_data()$cluster_names,
+                    selected = sample_data()$cluster_names)
+  
+  updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
+                       choices = sample_data()$cluster_names,
+                       selected = sample_data()$cluster_names)
+
+  updateSelectInput(session, "expression_dim_reduction_plot_projection_select",
+                    choices = sample_data()$projections,
+                    selected = sample_data()$projections)
+
+})
+
+
+
 
 ##----------------------------------------------------------------------------##
 ## UI: GENE SELECTION
@@ -26,6 +54,8 @@ output[["gene_selection_UI"]] <- renderUI ({
     )
   }
 })
+
+
 
 ## Observe reset Button
 observeEvent(input$reset_genes, {
@@ -214,17 +244,17 @@ output[["expression_expression_dim_reduction_plot_color_scale_range"]] <- render
 
 # Observe if sample_data has changed and update select_input
 # Observers use eagerevaluation (reactive lazy evaluation)!
-observe({
-  updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
-                    choices = sample_data()$cluster_names,
-                    selected = sample_data()$cluster_names)
-})
+# observe({
+#   updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
+#                     choices = sample_data()$cluster_names,
+#                     selected = sample_data()$cluster_names)
+# })
 
-observe({
-  updateSelectInput(session, "expression_dim_reduction_plot_projection_select",
-                    choices = sample_data()$projections,
-                    selected = sample_data()$projections)
-})
+# observe({
+#   updateSelectInput(session, "expression_dim_reduction_plot_projection_select",
+#                     choices = sample_data()$projections,
+#                     selected = sample_data()$projections)
+# })
 
 
 ##----------------------------------------------------------------------------##
@@ -522,11 +552,11 @@ output[["expression_violin_plot_options"]] <- renderUI({
 
 #Observe if sample_data has changed and update select_input
 #Observers use eagerevaluation (reactive lazy evaluation)!
-observe({
-  updateSelectInput(session, "expression_violin_plot_cluster_select",
-                    choices = sample_data()$cluster_names,
-                    selected = sample_data()$cluster_names)
-})
+# observe({
+#   updateSelectInput(session, "expression_violin_plot_cluster_select",
+#                     choices = sample_data()$cluster_names,
+#                     selected = sample_data()$cluster_names)
+# })
 
 ##----------------------------------------------------------------------------##
 # Expression Violin Plot
@@ -666,11 +696,12 @@ output[["expression_heatmap_UI"]] <- renderUI({
       ),
       tagList(
         column(width = 9, offset = 0, style = "padding: 0px;",
-            plotly::plotlyOutput("expression_heatmap", height = plot_height)
-        ),
+               plotly::plotlyOutput("expression_heatmap", height = plot_height)
+        )
+        ,
         column(width = 3, offset = 0, style = "padding-left: 20px;",
-            uiOutput("expression_heatmap_options"),
-            uiOutput("expression_heatmap_color_scale_range")
+               uiOutput("expression_heatmap_options"),
+               uiOutput("expression_heatmap_color_scale_range")
         )
       )
     )
@@ -679,13 +710,13 @@ output[["expression_heatmap_UI"]] <- renderUI({
 
 # heatmap controls
 output[["expression_heatmap_options"]] <- renderUI({
-  
+  print("heatmap options")
   tagList(
     shinyWidgets::pickerInput(
       "expression_heatmap_cluster_select",
       label = "Cluster selection",
       choices = sample_data()$cluster_names,
-      selected = sample_data()$cluster_names,
+      selected = sample_data()$cluster_names,  # selcected specifies initially selected values
       options = list("actions-box" = TRUE),
       multiple = TRUE
     ),
@@ -707,12 +738,14 @@ output[["expression_heatmap_options"]] <- renderUI({
 
 # Observe if sample_data has changed and update select_input
 # Observers use eagerevaluation (reactive lazy evaluation)!
-observe({
-  updateSelectInput(session, "expression_heatmap_cluster_select",
-                    choices = sample_data()$cluster_names,
-                    selected = sample_data()$cluster_names)
+# observe({
+#   updateSelectInput(session, "expression_heatmap_cluster_select",
+#                     choices = sample_data()$cluster_names,
+#                     selected = sample_data()$cluster_names)
+# 
+# })
 
-})
+
 
 ## color scale range
 output[["expression_heatmap_color_scale_range"]] <- renderUI({
@@ -767,6 +800,7 @@ output[["expression_heatmap"]] <- plotly::renderPlotly({
     input[["expression_heatmap_color_scale"]],
     input[["expression_heatmap_color_range_slider"]]
   )
+  print("heatmap graph")
   color_scale <- input[["expression_heatmap_color_scale"]]
   colorscale_min <- input[["expression_heatmap_color_range_slider"]][1]
   colorscale_max <- input[["expression_heatmap_color_range_slider"]][2]

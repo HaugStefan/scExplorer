@@ -43,10 +43,10 @@ tab_gene_expression <- tabItem(
     ),
     
     fluidRow(
-      uiOutput("expression_heatmap_UI")
+     uiOutput("expression_heatmap_UI")
     ),
     fluidRow(
-      uiOutput("expression_dim_reduction_UI")
+     uiOutput("expression_dim_reduction_UI")
       
     ),
   )
