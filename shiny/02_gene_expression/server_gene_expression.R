@@ -7,7 +7,7 @@
 # collapse the boxes.
 
 # Trace massages to browser:
-options(shiny.trace = TRUE)
+#options(shiny.trace = TRUE)
 
 
 
