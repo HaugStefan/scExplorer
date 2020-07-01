@@ -5,6 +5,7 @@
 tab_gene_expression <- tabItem(
   tabName = "gene_expression",
   tagList(
+    # Gene Selection
     fluidRow(
       cerebroBox(
         title = tagList("Gene Search",
@@ -44,34 +45,39 @@ tab_gene_expression <- tabItem(
         )
       )
     ),
-    
+    # Violin Plots
     fluidRow(
       #uiOutput("expression_violin_plot_UI")
-      cerebroBox(
-        title = tagList(
-          boxTitle("Expression levels by cluster"),
-          #cerebroInfoButton("expression_violin_plot_info")
-        ),
-        tagList(
-          column(width = 9, offset = 0, style = "padding: 0px;",
-                 #h1("expression by cluster")
-                 plotly::plotlyOutput("expression_violin_plot")
+      # wrap with conditional panel ==> if more than 1 gene is selected, violin plots are hidden.
+      conditionalPanel(
+        condition = "output.number_genes_selected <= 1",
+        cerebroBox(
+          #id = "expression_violin_plot_box",
+          title = tagList(
+            boxTitle("Expression levels by cluster"),
+            #cerebroInfoButton("expression_violin_plot_info")
           ),
-          column(width = 3, offset = 0, style = "padding-left: 20px;",
-                 #uiOutput("expression_violin_plot_options")
-                 shinyWidgets::pickerInput(
-                   "expression_violin_plot_cluster_select",
-                   label = "Cluster selection",
-                   choices = c(""),#sample_data()$cluster_names,
-                   selected = c(""),#sample_data()$cluster_names,
-                   options = list("actions-box" = TRUE),
-                   multiple = TRUE
-                 )
+          tagList(
+            column(width = 9, offset = 0, style = "padding: 0px;",
+                   #h1("expression by cluster")
+                   plotly::plotlyOutput("expression_violin_plot")
+            ),
+            column(width = 3, offset = 0, style = "padding-left: 20px;",
+                   #uiOutput("expression_violin_plot_options")
+                   shinyWidgets::pickerInput(
+                     "expression_violin_plot_cluster_select",
+                     label = "Cluster selection",
+                     choices = c(""),  # updated, when dataset is selected
+                     selected = c(""), # selcected specifies initially selected values
+                     options = list("actions-box" = TRUE),
+                     multiple = TRUE
+                   )
+            )
           )
         )
-      )
+    )
     ),
-    
+    # Expression Heatmap
     fluidRow(
       #uiOutput("expression_heatmap_UI")
       cerebroBox(
@@ -91,8 +97,8 @@ tab_gene_expression <- tabItem(
                    shinyWidgets::pickerInput(
                      "expression_heatmap_cluster_select",
                      label = "Cluster selection",
-                     choices = c(1,2,3,4), #sample_data()$cluster_names,
-                     selected = c(1,2,3,4), # sample_data()$cluster_names,  # selcected specifies initially selected values
+                     choices = c(""),  # updated, when dataset is selected
+                     selected = c(""), # selcected specifies initially selected values
                      options = list("actions-box" = TRUE),
                      multiple = TRUE
                    ),
@@ -108,13 +114,13 @@ tab_gene_expression <- tabItem(
                      choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
                      selected = "Cividis"
                    ),
-                   sliderInput(
-                     "expression_heatmap_color_range_slider",
-                     label = "Range of color scale",
-                     min = 0,
-                     max = 1,
-                     value = c(0, 1)
-                   )
+                   # sliderInput(
+                   #   "expression_heatmap_color_range_slider",
+                   #   label = "Range of color scale",
+                   #   min = 0,
+                   #   max = 1,
+                   #   value = c(0, 1)
+                   # )
                  )
           )
         )
@@ -122,9 +128,75 @@ tab_gene_expression <- tabItem(
       
       
     ),
+    # Dim Reduction Plot
     fluidRow(
       #uiOutput("expression_dim_reduction_UI")
-      
+      # wrap with conditional panel ==> if more than 1 gene is selected, violin plots are hidden.
+      conditionalPanel(
+        condition = "output.number_genes_selected <= 1",
+        cerebroBox(
+          title = tagList(
+            boxTitle("Dimensional reduction"),
+            # actionButton(
+            #   inputId = "expression_dim_reduction_plot_info",
+            #   label = "info",
+            #   icon = NULL,
+            #   class = "btn-xs",
+            #   title = "Show additional information for this panel.",
+            #   style = "margin-right: 5px"
+            # )
+          ),
+          tagList(
+            column(width = 9, offset = 0, style = "padding: 0px;",
+                   plotly::plotlyOutput(
+                     "dim_reduction_plot",
+                     width = "auto",
+                     height = 500 #"85vh"
+                   ),
+                   tags$br(),
+            ),
+            column(width = 3, offset = 0, style = "padding-left: 20px;",
+                   #uiOutput("expression_dim_reduction_plot_options"),
+                   tagList(
+                     selectInput(
+                       "expression_dim_reduction_plot_projection_select",
+                       label = "Projection",
+                       choices = c("")
+                     ),
+                     shinyWidgets::pickerInput(
+                       "expression_dim_reduction_plot_cluster_select",
+                       label = "Cluster selection",
+                       choices = c(""),
+                       selected = c(""),
+                       options = list("actions-box" = TRUE),
+                       multiple = TRUE
+                     ),
+                     selectInput(
+                       "expression_dim_reduction_plot_plotting_order",
+                       label = "Plotting order",
+                       choices = c("Random", "Highest expression on top"),
+                       selected = "Highest expression on top"
+                     ),
+                     sliderInput(
+                       "expression_dim_reduction_plot_dot_size",
+                       label = "Point size",
+                       min = 1,
+                       max = 20,
+                       step = 1,
+                       value = 5
+                     ),
+                     selectInput(
+                       "expression_dim_reduction_plot_color_scale",
+                       label = "Color scale",
+                       choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
+                       selected = "Cividis"
+                     )
+                   )#,
+                   #uiOutput("expression_expression_dim_reduction_plot_color_scale_range")
+            )
+          )
+        )
+      )
     ),
   )
 )

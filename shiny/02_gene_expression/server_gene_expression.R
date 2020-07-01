@@ -3,30 +3,25 @@
 ##----------------------------------------------------------------------------##
 
 
-# Here boxes are rendered by the server function because user actions can 
-# collapse the boxes.
-
-# Trace massages to browser:
+# Trace massages to browser (for debugging):
 options(shiny.trace = TRUE)
 
+# Loading screen for updating controls
+w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading Dataset ...")),
+                color = "rgb(0, 0, 0, .8)")
 
+
+##----------------------------------------------------------------------------##
+## UPDATE CONTROLS after sample data has changed
+##----------------------------------------------------------------------------##
 
 # Update controls when sample data has changed
 observeEvent(sample_data(),{
   
-  # updateSelectInput(session, "expression_violin_plot_cluster_select",
-  #                      choices = sample_data()$cluster_names,
-  #                      selected = sample_data()$cluster_names)
-  
-  # updateSelectInput(session, "expression_heatmap_cluster_select",
-  #                   choices = sample_data()$cluster_names,
-  #                   selected = sample_data()$cluster_names)
-  
   # show loading screen
   w$show()
   
-  
-  # Update gene list 
+    # Update gene list 
   updateSelectizeInput(session, "expression_genes_input",
                        choices =  rownames(sample_data()$expression),
                        server = TRUE)
@@ -40,13 +35,13 @@ observeEvent(sample_data(),{
                                   choices = sample_data()$cluster_names,
                                   selected = sample_data()$cluster_names)
   
-  updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
+  shinyWidgets::updatePickerInput(session, "expression_dim_reduction_plot_cluster_select",
                        choices = sample_data()$cluster_names,
                        selected = sample_data()$cluster_names)
 
   updateSelectInput(session, "expression_dim_reduction_plot_projection_select",
-                    choices = sample_data()$projections,
-                    selected = sample_data()$projections)
+                    choices = names(sample_data()$projections),
+                    selected = names(sample_data()$projections))
 
   w$hide()
 })
@@ -55,56 +50,27 @@ observeEvent(sample_data(),{
 
 
 ##----------------------------------------------------------------------------##
-## UI: GENE SELECTION
+## GENE SELECTION
 ##----------------------------------------------------------------------------##
 
-# output[["gene_selection_UI"]] <- renderUI ({
-#   if(is.null(sample_data())) {
-#     p("No dataset loaded.")
-#   } else {
-#     tagList(
-#       selectizeInput(
-#         'expression_genes_input',
-#         label = NULL,
-#         choices = gene_names(),  #rownames(sample_data()$expression),
-#         options = list(create = TRUE, placeholder = "Choose or enter gene name(s) here"),
-#         multiple = TRUE
-#       )
-#     )
-#   }
-# })
 
+# Output for number of selected genes (used for hiding violinplots and dim. reduction plots)
+output[["number_genes_selected"]] <- renderText ({
+  number_genes_selected <- length(input$expression_genes_input)
+  print(number_genes_selected)
+  number_genes_selected
+  
+})
+# following line needed so that cond. panel works with "output.number_genes_selected"
+outputOptions(output, "number_genes_selected", suspendWhenHidden = FALSE)
 
-## Observe reset Button
+# Observe reset Button
  observeEvent(input$reset_genes, {
-#   shinyjs::reset("gene_selection_UI")
    reset("expression_genes_input")
-   # updateSelectizeInput(session, "expression_genes_input",
-   #                      selected = NULL)
  }) 
 
 
-
-
-## Make gene names reactive and add loading animation
-# Here the sample expression data is loaded for the first time which takes 
-# the longest loading time.
-w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading Dataset ..."),
-                               p("Depending on connection and hardware, loading may require up to 60 seconds.")   ),
-                color = "rgb(0, 0, 0, .8)")
-
-gene_names <- reactive({
-  w$show()
-  gene_names <- rownames(sample_data()$expression)
-  w$hide()
-  gene_names
-})
-
-
-
-##----------------------------------------------------------------------------##
 # Gene Search Info Box
-
 observeEvent(input[["expression_info"]], {
   showModal(
     modalDialog(
@@ -151,119 +117,118 @@ genesToPlot <- reactive({
 ##----------------------------------------------------------------------------##
 # Dimensional reduction box
 
-output[["expression_dim_reduction_UI"]] <- renderUI({
-  if ( length(input[["expression_genes_input"]]) < 2) {
-    tagList(
-      cerebroBox(
-        title = tagList(
-          boxTitle("Dimensional reduction"),
-          # actionButton(
-          #   inputId = "expression_dim_reduction_plot_info",
-          #   label = "info",
-          #   icon = NULL,
-          #   class = "btn-xs",
-          #   title = "Show additional information for this panel.",
-          #   style = "margin-right: 5px"
-          # )
-        ),
-        tagList(
-          column(width = 9, offset = 0, style = "padding: 0px;",
-                 plotly::plotlyOutput(
-                   "dim_reduction_plot",
-                   width = "auto",
-                   height = 500 #"85vh"
-                 ),
-                 tags$br(),
-          ),
-          column(width = 3, offset = 0, style = "padding-left: 20px;",
-                 #div(style = "padding-left: 10px;",
-                 uiOutput("expression_dim_reduction_plot_options"),
-                 uiOutput("expression_expression_dim_reduction_plot_color_scale_range")
-          )
-        )
-      )
-    )
-  } else {
-      
-  }
-})
+# output[["expression_dim_reduction_UI"]] <- renderUI({
+#   if ( length(input[["expression_genes_input"]]) < 2) {
+#     tagList(
+#       cerebroBox(
+#         title = tagList(
+#           boxTitle("Dimensional reduction"),
+#           # actionButton(
+#           #   inputId = "expression_dim_reduction_plot_info",
+#           #   label = "info",
+#           #   icon = NULL,
+#           #   class = "btn-xs",
+#           #   title = "Show additional information for this panel.",
+#           #   style = "margin-right: 5px"
+#           # )
+#         ),
+#         tagList(
+#           column(width = 9, offset = 0, style = "padding: 0px;",
+#                  plotly::plotlyOutput(
+#                    "dim_reduction_plot",
+#                    width = "auto",
+#                    height = 500 #"85vh"
+#                  ),
+#                  tags$br(),
+#           ),
+#           column(width = 3, offset = 0, style = "padding-left: 20px;",
+#                  #div(style = "padding-left: 10px;",
+#                  uiOutput("expression_dim_reduction_plot_options"),
+#                  uiOutput("expression_expression_dim_reduction_plot_color_scale_range")
+#           )
+#         )
+#       )
+#     )
+#   } else {
+#       
+#   }
+# })
 
 
 ##----------------------------------------------------------------------------##
 # Dimensional reduction user interfaces
 
-output[["expression_dim_reduction_plot_options"]] <- renderUI({
-  
-  proj <- sample_data()$projections
-  #browser()
-  tagList(
-    selectInput(
-      "expression_dim_reduction_plot_projection_select",
-      label = "Projection",
-      choices = names(sample_data()$projections)
-    ),
-    shinyWidgets::pickerInput(
-      "expression_dim_reduction_plot_cluster_select",
-      label = "Cluster selection",
-      choices = sample_data()$cluster_names,
-      selected = sample_data()$cluster_names,
-      options = list("actions-box" = TRUE),
-      multiple = TRUE
-    ),
-    selectInput(
-      "expression_dim_reduction_plot_plotting_order",
-      label = "Plotting order",
-      choices = c("Random", "Highest expression on top"),
-      selected = "Highest expression on top"
-    ),
-    sliderInput(
-      "expression_dim_reduction_plot_dot_size",
-      label = "Point size",
-      min = scatter_plot_dot_size[["min"]],
-      max = scatter_plot_dot_size[["max"]],
-      step = scatter_plot_dot_size[["step"]],
-      value = scatter_plot_dot_size[["default"]]
-    ),
-    selectInput(
-      "expression_dim_reduction_plot_color_scale",
-      label = "Color scale",
-      choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
-      selected = "Cividis"
-    )
-  )
-})
+# output[["expression_dim_reduction_plot_options"]] <- renderUI({
+#   
+#   proj <- sample_data()$projections
+#   tagList(
+#     selectInput(
+#       "expression_dim_reduction_plot_projection_select",
+#       label = "Projection",
+#       choices = names(sample_data()$projections)
+#     ),
+#     shinyWidgets::pickerInput(
+#       "expression_dim_reduction_plot_cluster_select",
+#       label = "Cluster selection",
+#       choices = sample_data()$cluster_names,
+#       selected = sample_data()$cluster_names,
+#       options = list("actions-box" = TRUE),
+#       multiple = TRUE
+#     ),
+#     selectInput(
+#       "expression_dim_reduction_plot_plotting_order",
+#       label = "Plotting order",
+#       choices = c("Random", "Highest expression on top"),
+#       selected = "Highest expression on top"
+#     ),
+#     sliderInput(
+#       "expression_dim_reduction_plot_dot_size",
+#       label = "Point size",
+#       min = scatter_plot_dot_size[["min"]],
+#       max = scatter_plot_dot_size[["max"]],
+#       step = scatter_plot_dot_size[["step"]],
+#       value = scatter_plot_dot_size[["default"]]
+#     ),
+#     selectInput(
+#       "expression_dim_reduction_plot_color_scale",
+#       label = "Color scale",
+#       choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
+#       selected = "Cividis"
+#     )
+#   )
+# })
 
 ## color scale range
-output[["expression_expression_dim_reduction_plot_color_scale_range"]] <- renderUI({
-  req(
-    input[["expression_dim_reduction_plot_cluster_select"]]
-  )
-  range <- c(0,0)
-  if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
-    # display clusters if no genes were entered
-    clusters_to_display <- input[["expression_dim_reduction_plot_cluster_select"]]
-    cluster_number <- length(unique(clusters_to_display))
-    range<- c(0, cluster_number)
-  } else if (length(genesToPlot()$genes_to_display_present) == 1) {
-    range <- range(expression_dim_reduction_plot_data()$level)
-  }
-  
-  if ( range[1] == 0 & range[2] == 0 ) {
-    range[2] = 1
-  } else {
-    range[1] <- range[1] %>% round(digits = 2)
-    range[2] <- range[2] %>% round(digits = 2)
-  }
-  tagList(
-    sliderInput(
-      "expression_dim_reduction_plot_color_scale_range",
-      label = "Range of color scale",
-      min = range[1],
-      max = range[2],
-      value = c(range[1], range[2])
-    )
-  )
-})
+# output[["expression_expression_dim_reduction_plot_color_scale_range"]] <- renderUI({
+#   req(
+#     input[["expression_dim_reduction_plot_cluster_select"]]
+#   )
+#   range <- c(0,0)
+#   if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
+#     # display clusters if no genes were entered
+#     clusters_to_display <- input[["expression_dim_reduction_plot_cluster_select"]]
+#     cluster_number <- length(unique(clusters_to_display))
+#     range<- c(0, cluster_number)
+#   } else if (length(genesToPlot()$genes_to_display_present) == 1) {
+#     range <- range(expression_dim_reduction_plot_data()$level)
+#   }
+#   
+#   if ( range[1] == 0 & range[2] == 0 ) {
+#     range[2] = 1
+#   } else {
+#     range[1] <- range[1] %>% round(digits = 2)
+#     range[2] <- range[2] %>% round(digits = 2)
+#   }
+#   tagList(
+#     sliderInput(
+#       "expression_dim_reduction_plot_color_scale_range",
+#       label = "Range of color scale",
+#       min = range[1],
+#       max = range[2],
+#       value = c(range[1], range[2])
+#     )
+#   )
+# })
 
 # Observe if sample_data has changed and update select_input
 # Observers use eagerevaluation (reactive lazy evaluation)!
@@ -289,7 +254,7 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
     input[["expression_dim_reduction_plot_projection_select"]],
     input[["expression_dim_reduction_plot_dot_size"]],
     input[["expression_dim_reduction_plot_color_scale"]],
-    input[["expression_dim_reduction_plot_color_scale_range"]],
+    #input[["expression_dim_reduction_plot_color_scale_range"]],
     input[["expression_dim_reduction_plot_cluster_select"]]
   )
   
@@ -338,9 +303,9 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
           ),
           color = ~level,
           colorscale = color_scale,
-          cauto = FALSE,
-          cmin = input[["expression_dim_reduction_plot_color_scale_range"]][1],
-          cmax = input[["expression_dim_reduction_plot_color_scale_range"]][2],
+          cauto = TRUE,
+          #cmin = input[["expression_dim_reduction_plot_color_scale_range"]][1],
+          #cmax = input[["expression_dim_reduction_plot_color_scale_range"]][2],
           reversescale = TRUE,
           line = list(
             color = "rgb(196,196,196)",
@@ -401,9 +366,9 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
           showscale = show_scale,
           color = color_levels,
           colorscale = color_scale,
-          cauto = FALSE,
-          cmin = input[["expression_dim_reduction_plot_color_scale_range"]][1],
-          cmax = input[["expression_dim_reduction_plot_color_scale_range"]][2],
+          cauto = TRUE,
+          #cmin = input[["expression_dim_reduction_plot_color_scale_range"]][1],
+          #cmax = input[["expression_dim_reduction_plot_color_scale_range"]][2],
           reversescale = TRUE,
           line = list(
             color = "rgb(196,196,196)",

@@ -19,7 +19,7 @@
 sample_data <- reactive({
  
   if (is.null(input$table_scDatasets_rows_selected) || is.na(input$table_scDatasets_rows_selected) ) {
-    sample_data <- readRDS("data/example.rds")
+    sample_data <- NULL #readRDS("data/example.rds")
   } else {
     req(input$table_scDatasets_rows_selected)
     sample_data <- readRDS(paste0("data/", DStable[input$table_scDatasets_rows_selected, "FileName"]))
