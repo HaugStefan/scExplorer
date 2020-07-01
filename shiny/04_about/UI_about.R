@@ -13,8 +13,8 @@ tab_about <- tabItem(
     h4("The single-cell explorer \"scEplorer\" is a searchable database to visualize 
       gene expression from RNA-sequencing."),
     h4(HTML("Its intended use is to make datasets generated 
-      within the NephGen Initiative (CRC 1453) findable, accessible and searchable,
-      for all reasearchers within the initiative and to thereby promote scientific 
+      within the NephGen Initiative (CRC 1453) accessible and searchable,
+      for all researchers within the initiative and to thereby promote scientific 
       collaboration and progress. It allows for downloading of plots, as well as lists of marker genes. <br>
       Upon publication the datasets will also be publicly accessible via the scExplorer.")),
     
