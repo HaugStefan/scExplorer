@@ -21,7 +21,6 @@ tab_gene_expression <- tabItem(
         tagList(
           # gene list input
           column(width = 9, offset = 0, style = "padding: 0px;", 
-                 #uiOutput("gene_selection_UI")
                  selectizeInput(
                    'expression_genes_input',
                    label = NULL,
@@ -47,7 +46,6 @@ tab_gene_expression <- tabItem(
     ),
     # Violin Plots
     fluidRow(
-      #uiOutput("expression_violin_plot_UI")
       # wrap with conditional panel ==> if more than 1 gene is selected, violin plots are hidden.
       conditionalPanel(
         condition = "output.number_genes_selected <= 1",
@@ -63,7 +61,6 @@ tab_gene_expression <- tabItem(
                    plotly::plotlyOutput("expression_violin_plot")
             ),
             column(width = 3, offset = 0, style = "padding-left: 20px;",
-                   #uiOutput("expression_violin_plot_options")
                    shinyWidgets::pickerInput(
                      "expression_violin_plot_cluster_select",
                      label = "Cluster selection",
@@ -91,8 +88,6 @@ tab_gene_expression <- tabItem(
           )
           ,
           column(width = 3, offset = 0, style = "padding-left: 20px;",
-                 #uiOutput("expression_heatmap_options"),
-                 #uiOutput("expression_heatmap_color_scale_range")
                  tagList(
                    shinyWidgets::pickerInput(
                      "expression_heatmap_cluster_select",
@@ -113,14 +108,7 @@ tab_gene_expression <- tabItem(
                      label = "Color scale",
                      choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
                      selected = "Cividis"
-                   ),
-                   # sliderInput(
-                   #   "expression_heatmap_color_range_slider",
-                   #   label = "Range of color scale",
-                   #   min = 0,
-                   #   max = 1,
-                   #   value = c(0, 1)
-                   # )
+                   )
                  )
           )
         )
@@ -130,7 +118,6 @@ tab_gene_expression <- tabItem(
     ),
     # Dim Reduction Plot
     fluidRow(
-      #uiOutput("expression_dim_reduction_UI")
       # wrap with conditional panel ==> if more than 1 gene is selected, violin plots are hidden.
       conditionalPanel(
         condition = "output.number_genes_selected <= 1",
@@ -156,7 +143,6 @@ tab_gene_expression <- tabItem(
                    tags$br(),
             ),
             column(width = 3, offset = 0, style = "padding-left: 20px;",
-                   #uiOutput("expression_dim_reduction_plot_options"),
                    tagList(
                      selectInput(
                        "expression_dim_reduction_plot_projection_select",
@@ -191,8 +177,7 @@ tab_gene_expression <- tabItem(
                        choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
                        selected = "Cividis"
                      )
-                   )#,
-                   #uiOutput("expression_expression_dim_reduction_plot_color_scale_range")
+                   )
             )
           )
         )

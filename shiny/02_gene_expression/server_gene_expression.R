@@ -3,8 +3,8 @@
 ##----------------------------------------------------------------------------##
 
 
-# Trace massages to browser (for debugging):
-options(shiny.trace = TRUE)
+# Trace massages to browser (TRUE for debugging):
+ options(shiny.trace = FALSE)
 
 # Loading screen for updating controls
 w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading Dataset ...")),
@@ -56,7 +56,6 @@ observeEvent(sample_data(),{
 # Output for number of selected genes (used for hiding violinplots and dim. reduction plots)
 output[["number_genes_selected"]] <- renderText ({
   number_genes_selected <- length(input$expression_genes_input)
-  print(number_genes_selected)
   number_genes_selected
   
 })
@@ -110,7 +109,7 @@ genesToPlot <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## DIMENSIONAL REDUCTION PLOT (tsne, umap)
+## PLOT: DIMENSIONAL REDUCTION (tsne, umap)
 ##----------------------------------------------------------------------------##
 
 
@@ -301,7 +300,7 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
 
 
 ##----------------------------------------------------------------------------##
-## DIMENSION REDUCTION DATA
+## DATA: DIMENSION REDUCTION 
 ##----------------------------------------------------------------------------##
 
 expression_dim_reduction_plot_data <- reactive({
@@ -356,7 +355,7 @@ expression_dim_reduction_plot_data <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## EXPRESSION VIOLIN PLOT
+## PLOT: EXPRESSION VIOLIN
 ##----------------------------------------------------------------------------##
 
 
@@ -436,7 +435,7 @@ observeEvent(input[["expression_violin_plot_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
-## DATA: EXPRESSION FOR VIOLIN PLOT
+## DATA: EXPRESSION EXPRESSION VIOLIN
 ##----------------------------------------------------------------------------##
 
 expression_violin_plot_data <- reactive({
@@ -476,7 +475,7 @@ expression_violin_plot_data <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## EXPRESSION HEATMAP
+## PLOT: EXPRESSION HEATMAP
 ##----------------------------------------------------------------------------##
 
 
@@ -553,7 +552,7 @@ output[["expression_heatmap"]] <- plotly::renderPlotly({
 })
 
 ##----------------------------------------------------------------------------##
-## EXPRESSION HEATMAP DATA
+## DATA: EXPRESSION HEATMAP
 ##----------------------------------------------------------------------------##
 
 
@@ -616,11 +615,3 @@ expression_heatmap_data <- reactive({
 
   return(hmap_data)
 })
-
-
-
-
-
-
-
-
