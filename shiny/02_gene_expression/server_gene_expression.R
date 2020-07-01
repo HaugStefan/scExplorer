@@ -18,8 +18,7 @@ w <- Waiter$new(html = tagList(spin_wave(), h4( "Loading Dataset ...")),
 # Update controls when sample data has changed
 observeEvent(sample_data(),{
   
-  # show loading screen
-  w$show()
+  w$show() # show loading screen
   
     # Update gene list 
   updateSelectizeInput(session, "expression_genes_input",
@@ -43,7 +42,7 @@ observeEvent(sample_data(),{
                     choices = names(sample_data()$projections),
                     selected = names(sample_data()$projections))
 
-  w$hide()
+  w$hide() # hide loading screen
 })
 
 
@@ -111,142 +110,9 @@ genesToPlot <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## UI: DIMENSIONAL REDUCTION (tsne, umap)
+## DIMENSIONAL REDUCTION PLOT (tsne, umap)
 ##----------------------------------------------------------------------------##
 
-##----------------------------------------------------------------------------##
-# Dimensional reduction box
-
-# output[["expression_dim_reduction_UI"]] <- renderUI({
-#   if ( length(input[["expression_genes_input"]]) < 2) {
-#     tagList(
-#       cerebroBox(
-#         title = tagList(
-#           boxTitle("Dimensional reduction"),
-#           # actionButton(
-#           #   inputId = "expression_dim_reduction_plot_info",
-#           #   label = "info",
-#           #   icon = NULL,
-#           #   class = "btn-xs",
-#           #   title = "Show additional information for this panel.",
-#           #   style = "margin-right: 5px"
-#           # )
-#         ),
-#         tagList(
-#           column(width = 9, offset = 0, style = "padding: 0px;",
-#                  plotly::plotlyOutput(
-#                    "dim_reduction_plot",
-#                    width = "auto",
-#                    height = 500 #"85vh"
-#                  ),
-#                  tags$br(),
-#           ),
-#           column(width = 3, offset = 0, style = "padding-left: 20px;",
-#                  #div(style = "padding-left: 10px;",
-#                  uiOutput("expression_dim_reduction_plot_options"),
-#                  uiOutput("expression_expression_dim_reduction_plot_color_scale_range")
-#           )
-#         )
-#       )
-#     )
-#   } else {
-#       
-#   }
-# })
-
-
-##----------------------------------------------------------------------------##
-# Dimensional reduction user interfaces
-
-# output[["expression_dim_reduction_plot_options"]] <- renderUI({
-#   
-#   proj <- sample_data()$projections
-#   tagList(
-#     selectInput(
-#       "expression_dim_reduction_plot_projection_select",
-#       label = "Projection",
-#       choices = names(sample_data()$projections)
-#     ),
-#     shinyWidgets::pickerInput(
-#       "expression_dim_reduction_plot_cluster_select",
-#       label = "Cluster selection",
-#       choices = sample_data()$cluster_names,
-#       selected = sample_data()$cluster_names,
-#       options = list("actions-box" = TRUE),
-#       multiple = TRUE
-#     ),
-#     selectInput(
-#       "expression_dim_reduction_plot_plotting_order",
-#       label = "Plotting order",
-#       choices = c("Random", "Highest expression on top"),
-#       selected = "Highest expression on top"
-#     ),
-#     sliderInput(
-#       "expression_dim_reduction_plot_dot_size",
-#       label = "Point size",
-#       min = scatter_plot_dot_size[["min"]],
-#       max = scatter_plot_dot_size[["max"]],
-#       step = scatter_plot_dot_size[["step"]],
-#       value = scatter_plot_dot_size[["default"]]
-#     ),
-#     selectInput(
-#       "expression_dim_reduction_plot_color_scale",
-#       label = "Color scale",
-#       choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
-#       selected = "Cividis"
-#     )
-#   )
-# })
-
-## color scale range
-# output[["expression_expression_dim_reduction_plot_color_scale_range"]] <- renderUI({
-#   req(
-#     input[["expression_dim_reduction_plot_cluster_select"]]
-#   )
-#   range <- c(0,0)
-#   if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
-#     # display clusters if no genes were entered
-#     clusters_to_display <- input[["expression_dim_reduction_plot_cluster_select"]]
-#     cluster_number <- length(unique(clusters_to_display))
-#     range<- c(0, cluster_number)
-#   } else if (length(genesToPlot()$genes_to_display_present) == 1) {
-#     range <- range(expression_dim_reduction_plot_data()$level)
-#   }
-#   
-#   if ( range[1] == 0 & range[2] == 0 ) {
-#     range[2] = 1
-#   } else {
-#     range[1] <- range[1] %>% round(digits = 2)
-#     range[2] <- range[2] %>% round(digits = 2)
-#   }
-#   tagList(
-#     sliderInput(
-#       "expression_dim_reduction_plot_color_scale_range",
-#       label = "Range of color scale",
-#       min = range[1],
-#       max = range[2],
-#       value = c(range[1], range[2])
-#     )
-#   )
-# })
-
-# Observe if sample_data has changed and update select_input
-# Observers use eagerevaluation (reactive lazy evaluation)!
-# observe({
-#   updateSelectInput(session, "expression_dim_reduction_plot_cluster_select",
-#                     choices = sample_data()$cluster_names,
-#                     selected = sample_data()$cluster_names)
-# })
-
-# observe({
-#   updateSelectInput(session, "expression_dim_reduction_plot_projection_select",
-#                     choices = sample_data()$projections,
-#                     selected = sample_data()$projections)
-# })
-
-
-##----------------------------------------------------------------------------##
-# Dimensional reduction Plot
 
 output[["dim_reduction_plot"]] <- plotly::renderPlotly({
   
@@ -258,8 +124,8 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
     input[["expression_dim_reduction_plot_cluster_select"]]
   )
   
-  # plot only drawn for none or one gene (otherwise not shown)
-  if (length(genesToPlot()$genes_to_display_present) < 2 ) {
+  # plot only drawn if dataset is present and less than 2 genes selected
+  if (!is.null(sample_data()) && length(genesToPlot()$genes_to_display_present) < 2) {
   
     projections_available <- names(sample_data()$projections)
     projection_to_display <- input[["expression_dim_reduction_plot_projection_select"]]
@@ -435,7 +301,7 @@ output[["dim_reduction_plot"]] <- plotly::renderPlotly({
 
 
 ##----------------------------------------------------------------------------##
-## DATA: DIMENSION REDUCTION PLOT
+## DIMENSION REDUCTION DATA
 ##----------------------------------------------------------------------------##
 
 expression_dim_reduction_plot_data <- reactive({
@@ -482,9 +348,7 @@ expression_dim_reduction_plot_data <- reactive({
     } else if ( plot_order == "Highest expression on top" ) {
       plot <- plot[ order(plot$level, decreasing = FALSE) , ]
     }
-    
   } 
-  
   return(plot)
   
 })
@@ -492,62 +356,9 @@ expression_dim_reduction_plot_data <- reactive({
 
 
 ##----------------------------------------------------------------------------##
-## UI: EXPRESSION VIOLIN PLOT
+## EXPRESSION VIOLIN PLOT
 ##----------------------------------------------------------------------------##
 
-
-
-##----------------------------------------------------------------------------##
-# Expression violin plot box
-
-
-# output[["expression_violin_plot_UI"]] <- renderUI({
-#     if ( length(input[["expression_genes_input"]]) < 2) {
-#       tagList(
-#         cerebroBox(
-#           title = tagList(
-#             boxTitle("Expression levels by cluster"),
-#             #cerebroInfoButton("expression_violin_plot_info")
-#           ),
-#           tagList(
-#             column(width = 9, offset = 0, style = "padding: 0px;",
-#                    #h1("expression by cluster")
-#                    plotly::plotlyOutput("expression_violin_plot")
-#             ),
-#             column(width = 3, offset = 0, style = "padding-left: 20px;",
-#                    uiOutput("expression_violin_plot_options")
-#             )
-#           )
-#         )
-#       ) 
-#     } 
-# })
-  
-
-# output[["expression_violin_plot_options"]] <- renderUI({
-#   
-#   tagList(
-#     shinyWidgets::pickerInput(
-#       "expression_violin_plot_cluster_select",
-#       label = "Cluster selection",
-#       choices = sample_data()$cluster_names,
-#       selected = sample_data()$cluster_names,
-#       options = list("actions-box" = TRUE),
-#       multiple = TRUE
-#     )
-#   )
-# })
-
-#Observe if sample_data has changed and update select_input
-#Observers use eagerevaluation (reactive lazy evaluation)!
-# observeEvent(sample_data(),{
-#   shinyWidgets::updatePickerInput(session, "expression_violin_plot_cluster_select",
-#                     choices = sample_data()$cluster_names,
-#                     selected = sample_data()$cluster_names)
-# })
-
-##----------------------------------------------------------------------------##
-# Expression Violin Plot
 
 output[["expression_violin_plot"]] <- plotly::renderPlotly({
   
@@ -555,8 +366,8 @@ output[["expression_violin_plot"]] <- plotly::renderPlotly({
     input[["expression_violin_plot_cluster_select"]]
   )
   
-  # plot only drawn for none or one gene (otherwise not shown)
-  if (length(genesToPlot()$genes_to_display_present) < 2 ) {
+  # plot only drawn if dataset is present and less than 2 genes selected.
+  if (!is.null(sample_data()) && length(genesToPlot()$genes_to_display_present) < 2) {
     
     selected_clusters <- input[["expression_violin_plot_cluster_select"]]
     # check if genes were entered
@@ -625,7 +436,7 @@ observeEvent(input[["expression_violin_plot_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
-## DATA: EXPRESSION BY CLUSTER
+## DATA: EXPRESSION FOR VIOLIN PLOT
 ##----------------------------------------------------------------------------##
 
 expression_violin_plot_data <- reactive({
@@ -664,125 +475,12 @@ expression_violin_plot_data <- reactive({
 
 
 
-
 ##----------------------------------------------------------------------------##
-## UPDATE HEATMAP CONTROLS
+## EXPRESSION HEATMAP
 ##----------------------------------------------------------------------------##
 
-##----------------------------------------------------------------------------##
-# Heatmap Box
-
-# output[["expression_heatmap_UI"]] <- renderUI({
-#   
-#   plot_height <- "400px"
-#   
-#   tagList(
-#     cerebroBox(
-#       title = tagList(
-#         boxTitle("Average gene expression within clusters"),
-#         #cerebroInfoButton("expression_violin_plot_info")
-#       ),
-#       tagList(
-#         column(width = 9, offset = 0, style = "padding: 0px;",
-#                plotly::plotlyOutput("expression_heatmap", height = plot_height)
-#         )
-#         ,
-#         column(width = 3, offset = 0, style = "padding-left: 20px;",
-#                uiOutput("expression_heatmap_options"),
-#                uiOutput("expression_heatmap_color_scale_range")
-#         )
-#       )
-#     )
-#   )
-# })
-
-
-
-# heatmap controls
-# output[["expression_heatmap_options"]] <- renderUI({
-#   print("heatmap options")
-#   tagList(
-#     shinyWidgets::pickerInput(
-#       "expression_heatmap_cluster_select",
-#       label = "Cluster selection",
-#       choices = sample_data()$cluster_names,
-#       selected = sample_data()$cluster_names,  # selcected specifies initially selected values
-#       options = list("actions-box" = TRUE),
-#       multiple = TRUE
-#     ),
-#     selectInput(
-#       "expression_heatmap_rescaling_select",
-#       label = "Rescaling",
-#       choices = c("No rescaling", "Rescale per gene"),
-#       selected = "Random"
-#     ),
-#     selectInput(
-#       "expression_heatmap_color_scale",
-#       label = "Color scale",
-#       choices = c("Cividis","YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","Viridis"),
-#       selected = "Cividis"
-#     )
-#   )
-# })
-
-
-# Observe if sample_data has changed and update select_input
-# Observers use eagerevaluation (reactive lazy evaluation)!
-
-# update controls for expression heatmap when sample data changes
-observeEvent(sample_data(),{
-  
-  # Cluster Selection
-  # shinyWidgets::updatePickerInput(session, "expression_heatmap_cluster_select",
-  #                   choices = sample_data()$cluster_names,
-  #                   selected = sample_data()$cluster_names)
-  
-  # Color Range
-  # updateSliderInput(session, "expression_heatmap_color_range_slider",
-  #                   min = range[1],
-  #                   max = range[2],
-  #                   value = c(range[1], range[2])
-  # )
-  
-  
-})
-
-
-
-## color scale range
-# output[["expression_heatmap_color_scale_range"]] <- renderUI({
-#   
-#   if (!is.null((expression_heatmap_data()$av_expression)) && length(expression_heatmap_data()$av_expression) > 0)
-#        {
-#    
-#     range<- c(min(expression_heatmap_data()$av_expression), 
-#               max(expression_heatmap_data()$av_expression))
-#     
-#   } else {
-#     range <- c(0,1)
-#   }
-#   
-#   if ( range[1] == 0 & range[2] == 0 ) {
-#     range[2] = 1
-#   } else {
-#     range[1] <- range[1] %>% round(digits = 2)
-#     range[2] <- range[2] %>% round(digits = 2)
-#   }
-#   tagList(
-#     sliderInput(
-#       "expression_heatmap_color_range_slider",
-#       label = "Range of color scale",
-#       min = range[1],
-#       max = range[2],
-#       value = c(range[1], range[2])
-#     )
-#   )
-# })
-##----------------------------------------------------------------------------##
-# Heatmap Plot
 
 # Plot height (adapted to clusternumber and genenumber)
-
 expression_heatmap_height <- reactive({
   gene_number <- length(expression_heatmap_data()$genes)
   cluster_number <- length(expression_heatmap_data()$clusters)
@@ -790,7 +488,6 @@ expression_heatmap_height <- reactive({
   height <- min(400, floor(150 + gene_number * max(450 / cluster_number, 50)))
   
   return(height)
-  
 })
 
 
@@ -802,58 +499,61 @@ output[["expression_heatmap"]] <- plotly::renderPlotly({
     input[["expression_heatmap_color_scale"]]    #,
    # input[["expression_heatmap_color_range_slider"]]
   )
-  print("heatmap graph")
-  print(expression_heatmap_data()$av_expression)
-  color_scale <- input[["expression_heatmap_color_scale"]]
-  #colorscale_min <- input[["expression_heatmap_color_range_slider"]][1]
-  #colorscale_max <- input[["expression_heatmap_color_range_slider"]][2]
-    
-  plotly::plot_ly(
-    x = expression_heatmap_data()$clusters,
-    y = expression_heatmap_data()$genes,
-    z = expression_heatmap_data()$av_expression,
-    
-    #height = expression_heatmap_height(),
-    xgap = 4,
-    ygap = 4,
-    type = "heatmap",
-    colorscale= color_scale,
-    zauto = TRUE,
-    #zmin = colorscale_min,
-    #zmax = colorscale_max,
-    reversescale = FALSE,
-    colorbar = list(
-      title = "Expression",
-      lenmode = "pixels",
-      len = 120
-    )
-  )%>%
-    plotly::layout(
-      title = "",
-     
-      
-      xaxis = list(
-        title = "",
-        mirror = TRUE,
-        #autorange = TRUE,
-        showline = FALSE,
-        type = "category"
-      ),
-      yaxis = list(
-        #title = "Gene(s)",
-        autorange = TRUE,
-        hoverformat = ".2f",
-        mirror = TRUE,
-        showline = FALSE
-      ),
-      dragmode =  "select",
-      hovermode = "compare"
-    )
   
+  # plot only drawn if dataset is present
+  if (!is.null(sample_data())) {
+    
+    color_scale <- input[["expression_heatmap_color_scale"]]
+    #colorscale_min <- input[["expression_heatmap_color_range_slider"]][1]
+    #colorscale_max <- input[["expression_heatmap_color_range_slider"]][2]
+    
+    
+    plotly::plot_ly(
+      x = expression_heatmap_data()$clusters,
+      y = expression_heatmap_data()$genes,
+      z = expression_heatmap_data()$av_expression,
+      
+      #height = expression_heatmap_height(),
+      xgap = 4,
+      ygap = 4,
+      type = "heatmap",
+      colorscale= color_scale,
+      zauto = TRUE,
+      #zmin = colorscale_min,
+      #zmax = colorscale_max,
+      reversescale = FALSE,
+      colorbar = list(
+        title = "Expression",
+        lenmode = "pixels",
+        len = 120
+      )
+    )%>%
+      plotly::layout(
+        title = "",
+       
+        
+        xaxis = list(
+          title = "",
+          mirror = TRUE,
+          #autorange = TRUE,
+          showline = FALSE,
+          type = "category"
+        ),
+        yaxis = list(
+          #title = "Gene(s)",
+          autorange = TRUE,
+          hoverformat = ".2f",
+          mirror = TRUE,
+          showline = FALSE
+        ),
+        dragmode =  "select",
+        hovermode = "compare"
+      )
+  }
 })
 
 ##----------------------------------------------------------------------------##
-## DATA: HEATMAP
+## EXPRESSION HEATMAP DATA
 ##----------------------------------------------------------------------------##
 
 
@@ -907,40 +607,15 @@ expression_heatmap_data <- reactive({
     hmap_matrix <- NULL
   }
 
-  
-  # generate ouput data
+    # generate ouput data
   hmap_data <- list()
   hmap_data[["clusters"]] <- as.vector(hmap_dataframe$cluster)
-  #hmap_data[1] <- NULL
   hmap_data[["genes"]] <- as.vector(colnames(hmap_dataframe))
   hmap_data[["genes"]] <- hmap_data[["genes"]][-1]    # remove "cluster"
   hmap_data[["av_expression"]] <- hmap_matrix
-  #browser()
+
   return(hmap_data)
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
