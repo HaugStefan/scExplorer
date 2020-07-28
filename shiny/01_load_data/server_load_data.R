@@ -31,11 +31,11 @@ sample_data <- reactive({
   #   sample_data$sample_names <- sample_data$cells$sample %>% unique()
   # }
   #get list of cluster names (remove later)
-  if ( is.factor(sample_data$cells$cluster) ) {
-    sample_data$cluster_names <- levels(sample_data$cells$cluster)
-  } else {
-    sample_data$cluster_names <- sample_data$cells$cluster %>% unique() %>% sort()
-  }
+  # if ( is.factor(sample_data$cells$cluster) ) {
+  #   sample_data$cluster_names <- levels(sample_data$cells$cluster)
+  # } else {
+  #   sample_data$cluster_names <- sample_data$cells$cluster %>% unique() %>% sort()
+  # }
   
   sample_data
   

@@ -19,3 +19,6 @@ ds_table <- as.data.frame(ds_table)
 
 setwd("C:/Users/haugs/OneDrive/GenEpi/02_Projects/NephGen/scExplorer/scExplorer/data")
 saveRDS(ds_table, "scExplorer_datasets.RDS")
+
+
+            

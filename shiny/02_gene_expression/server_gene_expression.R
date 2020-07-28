@@ -406,6 +406,7 @@ output[["expression_violin_plot"]] <- plotly::renderPlotly({
         mirror = TRUE,
         showline = TRUE,
         type = "category",
+        categoryorder = "category ascending",
         autorange = TRUE,
         tickmode = "array",
         ticktext =~cluster
@@ -467,7 +468,7 @@ expression_violin_plot_data <- reactive({
   # plot$level <- genesToPlot()$genes_to_display_present %>%
   #   sample_data()$expression[ . , cells_to_display ] %>%
   #   Matrix::colMeans()
-
+ 
   return(plot)
   
 })
@@ -534,9 +535,11 @@ output[["expression_heatmap"]] <- plotly::renderPlotly({
         xaxis = list(
           title = "",
           mirror = TRUE,
-          #autorange = TRUE,
+          autorange = TRUE,
           showline = FALSE,
-          type = "category"
+          type = "category",
+          categoryorder = "array",    # "category ascending" does not work for heatmaps
+          categoryarray = sort(unique(expression_heatmap_data()$clusters))
         ),
         yaxis = list(
           #title = "Gene(s)",
@@ -588,7 +591,6 @@ expression_heatmap_data <- reactive({
   expression_matrix <- as.matrix(expression_matrix)
   hmap_dataframe <- cbind(cluster_matrix, expression_matrix)
   hmap_dataframe[2] <- NULL  # remove cell barcodes
-  
   
   if( ncol(hmap_dataframe) > 1) {
     # calculate average expression per cluster
