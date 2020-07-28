@@ -2,6 +2,18 @@
 ## Tab: Marker genes.
 ##----------------------------------------------------------------------------##
 
+# Currently selected dataset (displayed in title)
+output$selected_dataset_short_markergenes <- renderText({
+  if (!is.null(input$table_scDatasets_rows_selected)) {
+    
+    paste0("(selected dataset: ",
+           as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]),
+           ")")
+    
+  } else {
+    "(no dataset selected)"
+  }
+})
 
 # UI element
 output[["marker_genes_by_cluster_UI"]] <- renderUI({

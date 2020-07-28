@@ -8,15 +8,18 @@ tab_gene_expression <- tabItem(
     # Gene Selection
     fluidRow(
       cerebroBox(
-        title = tagList("Gene Search",
+        title = tagList(
+                 "Gene Search",
                         actionButton(
                           inputId = "expression_info",
                           label = "info",
                           icon = NULL,
                           class = "btn-xs",
                           title = "Show additional information for this panel.",
-                          style = "margin-right: 5px; margin-left: 10px;"
-                        )
+                          style = "margin-right: 10px; margin-left: 10px;"
+                        ),
+                 textOutput(inline = TRUE, "selected_dataset_short")
+
         ),
         tagList(
           # gene list input

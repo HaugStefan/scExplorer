@@ -45,6 +45,21 @@ observeEvent(sample_data(),{
   w$hide() # hide loading screen
 })
 
+##----------------------------------------------------------------------------##
+## CURRENTLY SELECTED DATASET
+##----------------------------------------------------------------------------##
+output$selected_dataset_short <- renderText({
+  if (!is.null(input$table_scDatasets_rows_selected)) {
+    
+    paste0("(selected dataset: ",
+           as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]),
+           ")")
+    
+  } else {
+    "(no dataset selected)"
+  }
+})
+
 
 
 
