@@ -82,6 +82,9 @@ outputOptions(output, "number_genes_selected", suspendWhenHidden = FALSE)
    reset("expression_genes_input")
  }) 
 
+##----------------------------------------------------------------------------##
+## INFO BUTTONS
+##----------------------------------------------------------------------------##
 
 # Gene Search Info Box
 observeEvent(input[["expression_info"]], {
@@ -89,6 +92,43 @@ observeEvent(input[["expression_info"]], {
     modalDialog(
       gene_search_info$text,
       title = gene_search_info$title,
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+
+# Violin Plot info box
+observeEvent(input[["violin_info"]], {
+  showModal(
+    modalDialog(
+      violin_info$text,
+      title = violin_info$title,
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+# Heatmap info box
+observeEvent(input[["heatmap_info"]], {
+  showModal(
+    modalDialog(
+      heatmap_info$text,
+      title = heatmap_info$title,
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+# Dim reduction info box
+observeEvent(input[["dimreduc_info"]], {
+  showModal(
+    modalDialog(
+      dimreduc_info$text,
+      title = dimreduc_info$title,
       easyClose = TRUE,
       footer = NULL
     )
@@ -427,7 +467,7 @@ output[["expression_violin_plot"]] <- plotly::renderPlotly({
         ticktext =~cluster
       ),
       yaxis = list(
-        title = "Expression level",
+        title = "Log-Normalized Expression",
         range = y_range,
         hoverformat = ".2f",
         mirror = TRUE,

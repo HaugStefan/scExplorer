@@ -56,7 +56,14 @@ tab_gene_expression <- tabItem(
           #id = "expression_violin_plot_box",
           title = tagList(
             boxTitle("Expression levels by cluster"),
-            #cerebroInfoButton("expression_violin_plot_info")
+            actionButton(
+              inputId = "violin_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 10px; margin-left: 10px;"
+            ),
           ),
           tagList(
             column(width = 9, offset = 0, style = "padding: 0px;",
@@ -83,7 +90,14 @@ tab_gene_expression <- tabItem(
       cerebroBox(
         title = tagList(
           boxTitle("Average gene expression within clusters"),
-          #cerebroInfoButton("expression_violin_plot_info")
+          actionButton(
+            inputId = "heatmap_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 10px; margin-left: 10px;"
+          )
         ),
         tagList(
           column(width = 9, offset = 0, style = "padding: 0px;",
@@ -127,14 +141,14 @@ tab_gene_expression <- tabItem(
         cerebroBox(
           title = tagList(
             boxTitle("Dimensional reduction"),
-            # actionButton(
-            #   inputId = "expression_dim_reduction_plot_info",
-            #   label = "info",
-            #   icon = NULL,
-            #   class = "btn-xs",
-            #   title = "Show additional information for this panel.",
-            #   style = "margin-right: 5px"
-            # )
+            actionButton(
+              inputId = "dimreduc_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 10px; margin-left: 10px;"
+            )
           ),
           tagList(
             column(width = 9, offset = 0, style = "padding: 0px;",

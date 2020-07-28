@@ -19,7 +19,7 @@ tab_load_data <- tabItem(
           DTOutput("table_scDatasets"),
           br(),
           br(),
-          p("The list of datasets will be regularly updated. Last update: 31.05.2020")
+          p("The list of datasets will be regularly updated. Last update: 28.07.2020")
         )
         
       ),
