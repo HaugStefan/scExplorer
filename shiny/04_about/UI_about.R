@@ -10,7 +10,7 @@ tab_about <- tabItem(
        style = "margin-top: 0px; margin-bottom: 20px;"),
     
     
-    h4("The single-cell explorer \"scEplorer\" is a searchable database to visualize 
+    h4("The single-cell explorer \"scExplorer\" is a searchable database to visualize 
       gene expression from RNA-sequencing."),
     h4(HTML("Its intended use is to make datasets generated 
       within the NephGen Initiative (CRC 1453) accessible and searchable,
