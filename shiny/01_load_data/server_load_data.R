@@ -3,19 +3,9 @@
 ##----------------------------------------------------------------------------##
 
 
-
-##--------------------------------------------------------------------------##
-# Global variable.
-##--------------------------------------------------------------------------##
-
-
-
-
 ##--------------------------------------------------------------------------##
 # Load or update sample data.
 ##--------------------------------------------------------------------------##
-
-
 sample_data <- reactive({
  
   if (is.null(input$table_scDatasets_rows_selected) || is.na(input$table_scDatasets_rows_selected) ) {
@@ -45,9 +35,7 @@ sample_data <- reactive({
 ##--------------------------------------------------------------------------##
 # dataset table
 ##--------------------------------------------------------------------------##
-
 output$table_scDatasets <- DT::renderDataTable(
-  
   # format datatable
   formattable::as.datatable(
     formattable(DStable) ,     # needs to be converted to formattable-table first.
@@ -71,30 +59,39 @@ output$table_scDatasets <- DT::renderDataTable(
 ##--------------------------------------------------------------------------##
 # display of selected dataset
 ##--------------------------------------------------------------------------##
-
-#
-
 # Dataset
 output$selected_dataset <- renderUI({
   if (!is.null(input$table_scDatasets_rows_selected)) {
     
-    tagList(
-      strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
-      p(as.character(DStable[input$table_scDatasets_rows_selected, "Organism"]), 
-        as.character(DStable[input$table_scDatasets_rows_selected, "Organ"]),
-        ", ",
-        as.character(DStable[input$table_scDatasets_rows_selected, "CellNumber"]),
-        " ",
-        as.character(DStable[input$table_scDatasets_rows_selected, "CellsNuclei"])
-        ),
-      p(strong(as.character(DStable[input$table_scDatasets_rows_selected, "Clusters"]),
-               " Clusters:"),
-        br(),
-        paste(sample_data()$cluster_names, sep = ", ", collapse = ", ")),
-      p(strong(" Comments:"),
-        br(),
-        as.character(DStable[input$table_scDatasets_rows_selected, "Comment"]))
-    )
+    if(DStable[input$table_scDatasets_rows_selected, "Access"]=="public") {
+    
+        tagList(
+          strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
+          p(as.character(DStable[input$table_scDatasets_rows_selected, "Organism"]), 
+            as.character(DStable[input$table_scDatasets_rows_selected, "Organ"]),
+            ", ",
+            as.character(DStable[input$table_scDatasets_rows_selected, "CellNumber"]),
+            " ",
+            as.character(DStable[input$table_scDatasets_rows_selected, "CellsNuclei"])
+            ),
+          p(strong(as.character(DStable[input$table_scDatasets_rows_selected, "Clusters"]),
+                   " Clusters:"),
+            br(),
+            paste(sample_data()$cluster_names, sep = ", ", collapse = ", ")),
+          p(strong(" Comments:"),
+            br(),
+            as.character(DStable[input$table_scDatasets_rows_selected, "Comment"]))
+        )
+    } else if (DStable[input$table_scDatasets_rows_selected, "Access"]=="CRC members") {
+          tagList(
+            strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
+            p("This dataset is accessible for CRC members only.", 
+              "Please ", tags$a(href="www.rstudio.com", "log in.", target="_blank")
+              
+            )
+            )
+
+}
   } else {
     h3("No dataset selected.")
   }
