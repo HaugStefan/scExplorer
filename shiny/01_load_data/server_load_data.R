@@ -12,21 +12,13 @@ sample_data <- reactive({
     sample_data <- NULL #readRDS("data/example.rds")
   } else {
     req(input$table_scDatasets_rows_selected)
-    sample_data <- readRDS(paste0("data/", DStable[input$table_scDatasets_rows_selected, "FileName"]))
+    if(DStable[input$table_scDatasets_rows_selected, "Access"]=="public") {
+        sample_data <- readRDS(paste0("data/", DStable[input$table_scDatasets_rows_selected, "FileName"]))
+    } else {
+        sample_data <- NULL
+    }
   }
-  #get list of sample names (remove later)
-  # if ( is.factor(sample_data$cells$sample) ) {
-  #   sample_data$sample_names <- levels(sample_data$cells$sample)
-  # } else {
-  #   sample_data$sample_names <- sample_data$cells$sample %>% unique()
-  # }
-  #get list of cluster names (remove later)
-  # if ( is.factor(sample_data$cells$cluster) ) {
-  #   sample_data$cluster_names <- levels(sample_data$cells$cluster)
-  # } else {
-  #   sample_data$cluster_names <- sample_data$cells$cluster %>% unique() %>% sort()
-  # }
-  
+
   sample_data
   
 })
@@ -82,9 +74,9 @@ output$selected_dataset <- renderUI({
             br(),
             as.character(DStable[input$table_scDatasets_rows_selected, "Comment"]))
         )
-    } else if (DStable[input$table_scDatasets_rows_selected, "Access"]=="CRC members") {
+    } else if (DStable[input$table_scDatasets_rows_selected, "Access"]=="CRC 1453 members") {
           tagList(
-            strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
+           strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
             p("This dataset is accessible for CRC members only.", 
               "Please ", tags$a(href="www.rstudio.com", "log in.", target="_blank")
               

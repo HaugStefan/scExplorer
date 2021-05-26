@@ -49,7 +49,7 @@ observeEvent(sample_data(),{
 ## CURRENTLY SELECTED DATASET
 ##----------------------------------------------------------------------------##
 output$selected_dataset_short <- renderText({
-  if (!is.null(input$table_scDatasets_rows_selected)) {
+  if (!is.null(input$table_scDatasets_rows_selected) && !is.null(sample_data())) {
     
     paste0("(selected dataset: ",
            as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]),

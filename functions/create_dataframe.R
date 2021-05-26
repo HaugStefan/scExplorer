@@ -21,13 +21,13 @@ ds_table <- list( "Wu" = c(Dataset='Wu',
                            CellsNuclei ='nuclei',
                            Comment="Lake et al., Nature Communications 2019",
                            FileName="lake_scExplorer.rds",
-                           Access="CRC members"))
+                           Access="CRC 1453 members"))
 ds_table <- t(as.data.frame(ds_table))
 ds_table <- as.data.frame(ds_table)
 
 
 
-setwd("C:/Users/haugs/OneDrive/GenEpi/02_Projects/03_scExplorer/scExplorer_ext/data/")
+setwd("C:/Users/haugs/OneDrive/GenEpi/02_Projects/03_scExplorer/scExplorer/data/")
 saveRDS(ds_table, "scExplorer_datasets.RDS")
 
 
