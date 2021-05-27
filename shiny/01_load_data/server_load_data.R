@@ -78,7 +78,7 @@ output$selected_dataset <- renderUI({
           tagList(
            strong(h3(as.character(DStable[input$table_scDatasets_rows_selected, "Dataset"]))),
             p("This dataset is accessible for CRC members only.", 
-              "Please ", tags$a(href="www.rstudio.com", "log in.", target="_blank")
+              "Please ", tags$a(href="http://nephgen-intern.imbi.uni-freiburg.de", "log in.")
               
             )
             )
