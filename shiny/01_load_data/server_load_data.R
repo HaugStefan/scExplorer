@@ -4,7 +4,7 @@
 
 
 ##--------------------------------------------------------------------------##
-# Load or update sample data.
+# Load or update sample data. DIFFERENT IN INTERNAL vs EXTERNAL scExplorer
 ##--------------------------------------------------------------------------##
 sample_data <- reactive({
  
@@ -49,7 +49,7 @@ output$table_scDatasets <- DT::renderDataTable(
 )
 
 ##--------------------------------------------------------------------------##
-# display of selected dataset
+# display of selected dataset DIFFERENT IN INTERNAL vs EXTERNAL scExplorer
 ##--------------------------------------------------------------------------##
 # Dataset
 output$selected_dataset <- renderUI({
